@@ -65,7 +65,7 @@ func dirTreeRecursion(out io.Writer, path string, printFiles bool, ident string)
 
 			err := dirTreeRecursion(out, m_path.Join(path, file.Name()), printFiles, nextIdent)
 			if err != nil {
-				return (err)
+				return err
 			}
 
 		} else if printFiles {
