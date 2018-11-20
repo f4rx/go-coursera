@@ -8,6 +8,7 @@ import (
 	// "strings"
 	"io/ioutil"
 	m_path "path"
+	"strconv"
 )
 
 func main() {
@@ -46,20 +47,35 @@ func dirTreeRecursion(out io.Writer, path string, printFiles bool, recCount int,
 		out.Write([]byte(ident))
 		out.Write([]byte(prefixMark))
 		out.Write([]byte(file.Name()))
-		out.Write([]byte("\n"))
-		if file.IsDir() {
-			// out.Write([]byte(strings.Repeat("        ", recCount)))
-			if l == i {
-				next_ident :=  ident + "        "
 
+
+		if file.IsDir() {
+					out.Write([]byte("\n"))
+
+			// out.Write([]byte(strings.Repeat("        ", recCount)))
+			var next_ident string
+			if l == i {
+				next_ident =  ident + "        "
 			} else {
-				next_ident :=  ident + "|       "
+				next_ident =  ident + "|       "
 			}
 
 			err := dirTreeRecursion(out, m_path.Join(path, file.Name()), printFiles, recCount+1, next_ident)
 			if err != nil {
 				return (err)
 			}
+
+		} else {
+			fileSize := file.Size()
+			var fileSizeStr string
+			if fileSize == 0 {
+				fileSizeStr = "empty"
+			} else {
+				fileSizeStr := strconv.FormatInt(fileSize, 10)
+			}
+
+			out.Write([]byte(" (" + fileSizeStr + "b)"))
+			out.Write([]byte("\n"))
 
 		}
 	}
