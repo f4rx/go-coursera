@@ -1,12 +1,9 @@
 package main
 
 import (
-	// "fmt"
 	"io"
-	"os"
-	// "path/filepath"
-	// "strings"
 	"io/ioutil"
+	"os"
 	m_path "path"
 	"strconv"
 )
@@ -17,8 +14,8 @@ func main() {
 		panic("usage go run main.go . [-f]")
 	}
 	path := os.Args[1]
-	printFiles := len(os.Args) == 3 && os.Args[2] == "-f"
-	err := dirTree(out, path, printFiles)
+	PrintFiles := len(os.Args) == 3 && os.Args[2] == "-f"
+	err := dirTree(out, path, PrintFiles)
 	if err != nil {
 		panic(err.Error())
 	}
@@ -31,6 +28,15 @@ func dirTree(out io.Writer, path string, printFiles bool) error {
 
 func dirTreeRecursion(out io.Writer, path string, printFiles bool, ident string) error {
 	files, err := ioutil.ReadDir(path)
+	if !printFiles {
+		var dirs []os.FileInfo
+		for _, file := range files {
+			if file.IsDir() {
+				dirs = append(dirs, file)
+			}
+		}
+		files = dirs
+	}
 	if err != nil {
 		return (err)
 	}
@@ -41,6 +47,7 @@ func dirTreeRecursion(out io.Writer, path string, printFiles bool, ident string)
 			prefixMark = `└───`
 		} else {
 		}
+
 		out.Write([]byte(ident))
 		out.Write([]byte(prefixMark))
 		out.Write([]byte(file.Name()))
@@ -60,7 +67,8 @@ func dirTreeRecursion(out io.Writer, path string, printFiles bool, ident string)
 				return (err)
 			}
 
-		} else {
+		} else if printFiles {
+
 			fileSize := file.Size()
 			var fileSizeStr string
 			if fileSize == 0 {
@@ -68,10 +76,8 @@ func dirTreeRecursion(out io.Writer, path string, printFiles bool, ident string)
 			} else {
 				fileSizeStr = strconv.FormatInt(fileSize, 10) + "b"
 			}
-
 			out.Write([]byte(" (" + fileSizeStr + ")"))
 			out.Write([]byte("\n"))
-
 		}
 	}
 	return nil
