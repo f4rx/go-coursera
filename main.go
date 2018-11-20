@@ -28,6 +28,9 @@ func dirTree(out io.Writer, path string, printFiles bool) error {
 
 func dirTreeRecursion(out io.Writer, path string, printFiles bool, ident string) error {
 	files, err := ioutil.ReadDir(path)
+	if err != nil {
+		return err
+	}
 	if !printFiles {
 		var dirs []os.FileInfo
 		for _, file := range files {
@@ -37,9 +40,7 @@ func dirTreeRecursion(out io.Writer, path string, printFiles bool, ident string)
 		}
 		files = dirs
 	}
-	if err != nil {
-		return (err)
-	}
+
 	l := len(files) - 1
 	for i, file := range files {
 		prefixMark := `├───`
