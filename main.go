@@ -50,15 +50,15 @@ func dirTreeRecursion(out io.Writer, path string, printFiles bool, recCount int,
 		if file.IsDir() {
 			// out.Write([]byte(strings.Repeat("        ", recCount)))
 			if l == i {
-				err := dirTreeRecursion(out, m_path.Join(path, file.Name()), printFiles, recCount+1, ident + "        ")
-						if err != nil {
-				return (err)
+				next_ident :=  ident + "        "
+
+			} else {
+				next_ident :=  ident + "|       "
 			}
-				} else {
-				err := dirTreeRecursion(out, m_path.Join(path, file.Name()), printFiles, recCount+1, ident + "|       ")
+
+			err := dirTreeRecursion(out, m_path.Join(path, file.Name()), printFiles, recCount+1, next_ident)
 			if err != nil {
 				return (err)
-			}
 			}
 
 		}
