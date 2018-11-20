@@ -25,42 +25,37 @@ func main() {
 }
 
 func dirTree(out io.Writer, path string, printFiles bool) error {
-	// fmt.Println(out, path, dirTree)
-	// os.Stderr.Write([]byte(path + "\n")
-	return dirTreeRecursion(out, path, printFiles, 0, "")
+	return dirTreeRecursion(out, path, printFiles, "")
 
 }
 
-func dirTreeRecursion(out io.Writer, path string, printFiles bool, recCount int, ident string) error {
+func dirTreeRecursion(out io.Writer, path string, printFiles bool, ident string) error {
 	files, err := ioutil.ReadDir(path)
 	if err != nil {
 		return (err)
 	}
 	l := len(files) - 1
 	for i, file := range files {
-		prefixMark := "├───"
+		prefixMark := `├───`
 		if l == i {
-			prefixMark = "└───"
+			prefixMark = `└───`
 		} else {
 		}
-		// out.Write([]byte(strings.Repeat("        ", recCount)))
 		out.Write([]byte(ident))
 		out.Write([]byte(prefixMark))
 		out.Write([]byte(file.Name()))
 
-
 		if file.IsDir() {
-					out.Write([]byte("\n"))
+			out.Write([]byte("\n"))
 
-			// out.Write([]byte(strings.Repeat("        ", recCount)))
-			var next_ident string
+			var nextIdent string
 			if l == i {
-				next_ident =  ident + "        "
+				nextIdent = ident + "\t"
 			} else {
-				next_ident =  ident + "|       "
+				nextIdent = ident + "│\t"
 			}
 
-			err := dirTreeRecursion(out, m_path.Join(path, file.Name()), printFiles, recCount+1, next_ident)
+			err := dirTreeRecursion(out, m_path.Join(path, file.Name()), printFiles, nextIdent)
 			if err != nil {
 				return (err)
 			}
@@ -71,10 +66,10 @@ func dirTreeRecursion(out io.Writer, path string, printFiles bool, recCount int,
 			if fileSize == 0 {
 				fileSizeStr = "empty"
 			} else {
-				fileSizeStr := strconv.FormatInt(fileSize, 10)
+				fileSizeStr = strconv.FormatInt(fileSize, 10) + "b"
 			}
 
-			out.Write([]byte(" (" + fileSizeStr + "b)"))
+			out.Write([]byte(" (" + fileSizeStr + ")"))
 			out.Write([]byte("\n"))
 
 		}

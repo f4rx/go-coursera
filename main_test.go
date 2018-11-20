@@ -44,7 +44,7 @@ func TestTreeFull(t *testing.T) {
 	}
 	result := out.String()
 	if result != testFullResult {
-		t.Errorf("test for OK Failed - results not match\nGot:\n%v\nExpected:\n%v", result, testFullResult)
+		t.Errorf("test for OK Failed - results not match\nGot:\n```%v```\nExpected:\n```%v```", result, testFullResult)
 	}
 }
 
