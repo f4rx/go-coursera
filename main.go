@@ -22,11 +22,11 @@ func main() {
 }
 
 func dirTree(out io.Writer, path string, printFiles bool) error {
-	return dirTreeRecursion(out, path, printFiles, "")
+	return dirTreeRecursion(out, path, "", printFiles)
 
 }
 
-func dirTreeRecursion(out io.Writer, path string, printFiles bool, ident string) error {
+func dirTreeRecursion(out io.Writer, path, ident string, printFiles bool) (err error) {
 	files, err := ioutil.ReadDir(path)
 	if err != nil {
 		return err
@@ -46,24 +46,33 @@ func dirTreeRecursion(out io.Writer, path string, printFiles bool, ident string)
 		prefixMark := `├───`
 		if l == i {
 			prefixMark = `└───`
-		} else {
 		}
 
-		out.Write([]byte(ident))
-		out.Write([]byte(prefixMark))
-		out.Write([]byte(file.Name()))
+		_, err = out.Write([]byte(ident))
+		if err != nil {
+			return err
+		}
+		_, err = out.Write([]byte(prefixMark))
+		if err != nil {
+			return err
+		}
+		_, err = out.Write([]byte(file.Name()))
+		if err != nil {
+			return err
+		}
 
 		if file.IsDir() {
-			out.Write([]byte("\n"))
-
-			var nextIdent string
-			if l == i {
-				nextIdent = ident + "\t"
-			} else {
-				nextIdent = ident + "│\t"
+			_, err = out.Write([]byte("\n"))
+			if err != nil {
+				return err
 			}
 
-			err := dirTreeRecursion(out, m_path.Join(path, file.Name()), printFiles, nextIdent)
+			nextIdent := ident + "│\t"
+			if l == i {
+				nextIdent = ident + "\t"
+			}
+
+			err := dirTreeRecursion(out, m_path.Join(path, file.Name()), nextIdent, printFiles)
 			if err != nil {
 				return err
 			}
@@ -71,15 +80,19 @@ func dirTreeRecursion(out io.Writer, path string, printFiles bool, ident string)
 		} else if printFiles {
 
 			fileSize := file.Size()
-			var fileSizeStr string
-			if fileSize == 0 {
-				fileSizeStr = "empty"
-			} else {
+			fileSizeStr := "empty"
+			if fileSize != 0 {
 				fileSizeStr = strconv.FormatInt(fileSize, 10) + "b"
 			}
-			out.Write([]byte(" (" + fileSizeStr + ")"))
-			out.Write([]byte("\n"))
+			_, err = out.Write([]byte(" (" + fileSizeStr + ")"))
+			if err != nil {
+				return err
+			}
+			_, err = out.Write([]byte("\n"))
+			if err != nil {
+				return err
+			}
 		}
 	}
-	return nil
+	return
 }
